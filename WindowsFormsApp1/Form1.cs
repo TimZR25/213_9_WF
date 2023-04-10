@@ -24,7 +24,7 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear(); //очистка
+            chart1.Series[0].Points.Clear();
 
             int N = 1000;
 
@@ -58,7 +58,7 @@ namespace WindowsFormsApp1
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            int buff = 0;
+            int buff;
             if (int.TryParse(textBox1.Text, out buff) && buff > 0)
             {
                 Interval = buff;
