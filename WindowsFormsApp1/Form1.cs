@@ -24,7 +24,7 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear(); //Проверка 3
+            chart1.Series[0].Points.Clear();
 
             int N = 1000;
 
