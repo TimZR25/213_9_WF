@@ -74,10 +74,10 @@ namespace WindowsFormsApp1
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Random random = new Random();
-            for (int i = 0; i < NumCount; i++)
-            {
-                Numbers[i] = random.NextDouble();
+            Random random = new Random(); 
+            for (int i = 0; i < NumCount; i++) 
+            { 
+                Numbers[i] = random.NextDouble(); 
             }
         }
     }
