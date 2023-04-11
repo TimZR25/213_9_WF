@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,10 +13,15 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         public int Interval;
+        public int Columns = 1;
+        public int NumCount = 1000;
+        public double[] Numbers;
 
         public Form1()
         {
             InitializeComponent();
+
+            Numbers = new double[NumCount];
 
             textBox1.TextChanged += textBox1_TextChanged;
             chart1.Series[0].Name = "Вероятность СВ";
@@ -26,28 +31,19 @@ namespace WindowsFormsApp1
         {
             chart1.Series[0].Points.Clear();
 
-            int N = 1000;
+            if (Numbers.Count() == 0) return;
 
-            double[] numbers = new double[N];
-            Random random = new Random();
-            for (int i = 0; i < N; i++)
+
+            
+
+            for (int i = 0; i < NumCount/Columns; i++)
             {
                 double sum = 0;
-                for (int j = 0; j < 20; j++)
+                for (int j = 0; j < Columns; j++)
                 {
-                    sum += random.NextDouble();
+                    sum += Numbers[i*Columns+j];
                 }
-                numbers[i] = sum/20d;
-            }
-
-            for (int i = 0; i < Interval; i++)
-            {
-                double sum = 0;
-                for (int j = 0; j < 1000 / Interval; j++)
-                {
-                    sum += numbers[i*Interval + j];
-                }
-                chart1.Series[0].Points.AddXY(0, sum/ (1000 / Interval));
+                chart1.Series[0].Points.AddXY(0, sum/Columns);
             }
         }
 
@@ -62,6 +58,7 @@ namespace WindowsFormsApp1
             if (int.TryParse(textBox1.Text, out buff) && buff > 0)
             {
                 Interval = buff;
+                Columns = (int)(NumCount / Interval);
             }
         }
 
@@ -73,6 +70,15 @@ namespace WindowsFormsApp1
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Random random = new Random();
+            for (int i = 0; i < NumCount; i++)
+            {
+                Numbers[i] = random.NextDouble();
+            }
         }
     }
 }
