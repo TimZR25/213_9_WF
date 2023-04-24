@@ -1,0 +1,177 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace histogram
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            DrawHistogram();
+        }
+
+        static double minValue2 = 6;
+        static double maxValue2 = 30;
+        static int valueCount2 = 500;
+        static int binCount2 = 30;
+
+        static double minValue1 = 0;
+        static double maxValue1 = 1;
+        static int valueCount1 = 10000;
+        static int binCount1 = 20;
+
+        double[] data1 = new double[valueCount1];
+        int[] bins1 = new int[binCount1];
+        double binStep1 = (maxValue1 - minValue1) / Convert.ToDouble(binCount1);
+        int maxBin1 = 0;
+
+        double[] data2 = new double[valueCount2];
+        int[] bins2 = new int[binCount2];
+        double binStep2 = (maxValue2 - minValue2) / Convert.ToDouble(binCount2);
+        int maxBin2 = 0;
+
+        private void InitializeData()
+        {
+            int i;
+
+            // Create data array with random numbers
+            Random rnd = new Random();
+            for (i = 0; i < data1.Length; ++i)
+            {
+                data1[i] = minValue1 + rnd.NextDouble() * (maxValue1 - minValue1);
+            }
+
+
+            // Initialize bins
+            for (i = 0; i < data1.Length; ++i)
+            {
+                int binIndex1 = Convert.ToInt32(Math.Floor(data1[i] / binStep1));
+                bins1[binIndex1]++;
+
+                if (maxBin1 < bins1[binIndex1])
+                {
+                    maxBin1 = bins1[binIndex1];
+                }
+            }
+
+            // Create data array 2
+            int k = 0;
+            double summ = 0;
+            int j = 0;
+            for (i = 0; i < data1.Length; i++)
+            {
+                if (k < 20)
+                {
+                    summ += data1[i];
+                    k++;
+                }
+                else
+                {
+                    data2[j] = summ;
+                    summ = 0;
+                    j++;
+                    k = 0;
+                    i--;
+                }
+            }
+
+            // Initialize bins
+            for (i = 0; i < data2.Length; ++i)
+            {
+                int binIndex = Convert.ToInt32(Math.Floor(data2[i] / binStep2));
+                bins2[binIndex]++;
+
+                if (maxBin2 < bins2[binIndex])
+                {
+                    maxBin2 = bins2[binIndex];
+                }
+            }
+            DrawHistogram();
+        }
+
+        private void DrawHistogram()
+        {
+            int xMargin = 100;
+            int yMargin = 100;
+
+            Point origin1 = new Point(xMargin - 50, this.Size.Height - yMargin); // left bottom point of the histogram
+            int areaWidth1 = ((this.Size.Width / 2) - xMargin);   // histogram area width (without lables)
+            int areaHeight1 = this.Size.Height - 2 * yMargin; // histogram area height (without labels)
+
+            int binWidth1 = areaWidth1 / binCount1;
+            int i;
+
+            Graphics g = this.CreateGraphics();
+            g.Clear(Color.White);
+
+            Pen binPen1 = new Pen(Color.Black, 1);
+            SolidBrush binBrush1 = new SolidBrush(Color.PowderBlue);
+
+            // Draw bins
+            for (i = 0; i < bins1.Length; ++i)
+            {
+                if (maxBin1 == 0) continue;
+
+                int binHeight1 = areaHeight1 * bins1[i] / maxBin1;
+                Point binLeftTop1 = new Point(origin1.X + i * binWidth1, origin1.Y - binHeight1);
+                Size binSize1 = new Size(binWidth1, binHeight1);
+
+                // Draw rectangle
+                Rectangle r1 = new Rectangle(binLeftTop1, binSize1);
+                g.FillRectangle(binBrush1, r1);
+                g.DrawRectangle(binPen1, r1);
+            }
+
+            Pen pen1 = new Pen(Color.Black, 1);
+            g.DrawLine(pen1, xMargin - 50, this.Size.Height - yMargin, areaWidth1 + 70, this.Size.Height - yMargin);
+            g.DrawLine(pen1, xMargin - 50, yMargin - 5, xMargin - 50, this.Size.Height - yMargin);
+
+            Point origin2 = new Point(areaWidth1 + 100, this.Size.Height - yMargin); // left bottom point of the histogram
+            int areaWidth2 = (this.Size.Width / 2 - xMargin);   // histogram area width (without lables)
+            int areaHeight2 = this.Size.Height - 2 * yMargin; // histogram area height (without labels)
+
+            int binWidth2 = areaWidth2 / binCount1;
+
+            Pen binPen2 = new Pen(Color.Black, 1);
+            SolidBrush binBrush2 = new SolidBrush(Color.CornflowerBlue);
+
+            g.DrawLine(pen1, areaWidth1 + xMargin, this.Size.Height - yMargin, areaWidth2*2 + xMargin, this.Size.Height - yMargin);
+            g.DrawLine(pen1, areaWidth1+100, this.Size.Height - yMargin, areaWidth1 +100, yMargin - 5);
+
+            // Draw bins
+            for (i = 0; i < bins2.Length; ++i)
+            {
+                if (maxBin2 == 0) continue;
+
+                int binHeight2 = areaHeight2 * bins2[i] / maxBin2;
+                Point binLeftTop2 = new Point(origin2.X + i * binWidth2, origin2.Y - binHeight2);
+                Size binSize2 = new Size(binWidth2, binHeight2);
+
+                // Draw rectangle
+                Rectangle r2 = new Rectangle(binLeftTop2, binSize2);
+                g.FillRectangle(binBrush2, r2);
+                g.DrawRectangle(binPen2, r2);
+            }
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            InitializeData();
+            DrawHistogram();
+        }
+    }
+}
