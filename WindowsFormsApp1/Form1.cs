@@ -34,8 +34,6 @@ namespace WindowsFormsApp1
             if (Numbers.Count() == 0) return;
 
 
-            
-
             for (int i = 0; i < NumCount/Columns; i++)
             {
                 double sum = 0;
@@ -49,7 +47,7 @@ namespace WindowsFormsApp1
 
         private void chart1_Click(object sender, EventArgs e)
         {
-
+            button1_Click(sender, e);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
