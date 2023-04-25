@@ -29,25 +29,12 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            chart1.Series[0].Points.Clear();
-
-            if (Numbers.Count() == 0) return;
-
-
-            for (int i = 0; i < NumCount/Columns; i++)
-            {
-                double sum = 0;
-                for (int j = 0; j < Columns; j++)
-                {
-                    sum += Numbers[i*Columns+j];
-                }
-                chart1.Series[0].Points.AddXY(0, sum/Columns);
-            }
+            Draw_Histogram();
         }
 
         private void chart1_Click(object sender, EventArgs e)
         {
-            button1_Click(sender, e);
+            Draw_Histogram();
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -72,11 +59,61 @@ namespace WindowsFormsApp1
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Random random = new Random(); 
-            for (int i = 0; i < NumCount; i++) 
-            { 
-                Numbers[i] = random.NextDouble(); 
+            if (comboBox1.SelectedIndex == 0)
+            {
+                Generate_UniformDistribution();
             }
+
+            if (comboBox1.SelectedIndex == 1)
+            {
+                Generate_NormalDistribution();
+            }
+        }
+
+        private void Generate_UniformDistribution()
+        {
+            Random random = new Random();
+            for (int i = 0; i < NumCount; i++)
+            {
+                Numbers[i] = random.NextDouble();
+            }
+        }
+
+        private void Generate_NormalDistribution()
+        {
+            Random random = new Random();
+            double stdDev = 0.5;
+            double mean = 0.0;
+            for (int i = 0; i < NumCount; i++)
+            {
+                double randomNumber = random.NextDouble();
+                double normalRandomNumber = 1 / (stdDev * Math.Sqrt(2 * Math.PI)) * Math.Exp(-Math.Pow(randomNumber - mean, 2) / 2 * Math.Pow(stdDev, 2));
+                Numbers[i] = normalRandomNumber;
+            }
+            
+        }
+
+        private void Draw_Histogram()
+        {
+            chart1.Series[0].Points.Clear();
+
+            if (Numbers.Count() == 0) return;
+
+
+            for (int i = 0; i < NumCount / Columns; i++)
+            {
+                double sum = 0;
+                for (int j = 0; j < Columns; j++)
+                {
+                    sum += Numbers[i * Columns + j];
+                }
+                chart1.Series[0].Points.AddXY(0, sum / Columns);
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
