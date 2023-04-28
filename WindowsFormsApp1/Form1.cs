@@ -12,62 +12,56 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-        public int Interval;
+        public int Interval = 1;
         public int Columns = 1;
         public int NumCount = 1000;
-        public double[] Numbers;
+        public double[] UniformNumbers;
+        public double[] NormalNumbers;
+        public int MinNum = 0;
+        public int MaxNum = 1;
+
 
         public Form1()
         {
             InitializeComponent();
 
-            Numbers = new double[NumCount];
+            UniformNumbers = new double[NumCount];
+            NormalNumbers = new double[NumCount/20];
 
-            textBox1.TextChanged += textBox1_TextChanged;
             chart1.Series[0].Name = "Вероятность СВ";
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Draw_Histogram();
-        }
-
-        private void chart1_Click(object sender, EventArgs e)
-        {
-            Draw_Histogram();
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            int buff;
-            if (int.TryParse(textBox1.Text, out buff) && buff > 0)
-            {
-                Interval = buff;
-                Columns = (int)(NumCount / Interval);
-            }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
             if (comboBox1.SelectedIndex == 0)
             {
-                Generate_UniformDistribution();
+                Draw_Histogram(UniformNumbers);
             }
 
             if (comboBox1.SelectedIndex == 1)
             {
-                Generate_NormalDistribution();
+                Draw_Histogram(NormalNumbers);
             }
+        }
+
+        private void chart1_Click(object sender, EventArgs e)
+        {
+            if (comboBox1.SelectedIndex == 0)
+            {
+                Draw_Histogram(UniformNumbers);
+            }
+
+            if (comboBox1.SelectedIndex == 1)
+            {
+                Draw_Histogram(NormalNumbers);
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+                Generate_UniformDistribution();
+
+                Generate_NormalDistribution();
         }
 
         private void Generate_UniformDistribution()
@@ -75,45 +69,47 @@ namespace WindowsFormsApp1
             Random random = new Random();
             for (int i = 0; i < NumCount; i++)
             {
-                Numbers[i] = random.NextDouble();
+                UniformNumbers[i] = MinNum + random.NextDouble() * (MaxNum - MinNum);
             }
         }
 
         private void Generate_NormalDistribution()
         {
-            Random random = new Random();
-            double stdDev = 0.5;
-            double mean = 0.0;
-            for (int i = 0; i < NumCount; i++)
+            for (int i = 0; i < NormalNumbers.Length; i++)
             {
-                double randomNumber = random.NextDouble();
-                double normalRandomNumber = 1 / (stdDev * Math.Sqrt(2 * Math.PI)) * Math.Exp(-Math.Pow(randomNumber - mean, 2) / 2 * Math.Pow(stdDev, 2));
-                Numbers[i] = normalRandomNumber;
+                double sum = 0.0;
+                for (int j = 0; j < 20; j++)
+                {
+                    sum += UniformNumbers[i*20+j];
+                }
+                NormalNumbers[i] = sum;
             }
-            
         }
 
-        private void Draw_Histogram()
+        private void Draw_Histogram(double[] numbers)
         {
             chart1.Series[0].Points.Clear();
 
-            if (Numbers.Count() == 0) return;
+            if (numbers.Length == 0) return;
 
+            int columns = numbers.Length / Interval;
 
-            for (int i = 0; i < NumCount / Columns; i++)
+            for (int i = 0; i < Interval; i++)
             {
                 double sum = 0;
-                for (int j = 0; j < Columns; j++)
+                for (int j = 0; j < columns; j++)
                 {
-                    sum += Numbers[i * Columns + j];
+                    sum += numbers[i * columns + j];
                 }
-                chart1.Series[0].Points.AddXY(0, sum / Columns);
+                chart1.Series[0].Points.AddXY(0, sum / columns);
             }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-
+            numericUpDown1.Maximum = NumCount;
+            numericUpDown1.Minimum = 1;
+            Interval = Convert.ToInt32(numericUpDown1.Value);
         }
     }
 }
